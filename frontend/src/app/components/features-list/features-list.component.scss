@@ -1,0 +1,99 @@
+/* Fundo geral da lista - caso queira isolar a cor de fundo do resto do app */
+.dark-list-container {
+  background-color: #121212;
+  padding: 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  border-radius: 12px;
+}
+
+.section-group {
+  margin-bottom: 32px;
+}
+
+/* Cabeçalho sutil das seções */
+.section-header {
+  color: #9ca3af; /* Cinza claro */
+  text-transform: uppercase;
+  font-size: 0.75rem; /* Fonte pequena */
+  letter-spacing: 0.1em; /* Espaçamento entre letras */
+  margin-bottom: 12px;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+/* Estrutura do Card */
+.feature-card {
+  background-color: #2a2a2a; /* Cinza escuro */
+  border-radius: 16px; /* Bordas bem arredondadas */
+  padding: 16px;
+  margin-bottom: 12px;
+  
+  /* Layout Interno: Flexbox horizontal com gap */
+  display: flex;
+  align-items: flex-start; /* Alinhamento ao topo para lidar bem com descrições longas */
+  gap: 16px; 
+  
+  /* Interatividade e estética clean */
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.feature-card:active {
+  transform: scale(0.98);
+  background-color: #333333;
+}
+
+/* Badge (Pílula) */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 9999px; /* Formato 100% arredondado (pílula) */
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  height: max-content;
+  white-space: nowrap;
+}
+
+/* Variações de cor das tags conforme categoria */
+.badge-ux {
+  background-color: rgba(59, 130, 246, 0.15); /* Azul translúcido */
+  color: #60a5fa; /* Texto azul vibrante */
+}
+
+.badge-feature {
+  background-color: rgba(16, 185, 129, 0.15); /* Verde translúcido */
+  color: #34d399; /* Texto verde vibrante */
+}
+
+.badge-visual {
+  background-color: rgba(168, 85, 247, 0.15); /* Roxo translúcido */
+  color: #c084fc; /* Texto roxo vibrante */
+}
+
+/* Coluna de Textos */
+.content-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Textos */
+.title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600; /* Semi-bold */
+  margin: 0;
+  line-height: 1.2;
+}
+
+.description {
+  color: #d1d5db; /* Cinza mais claro */
+  font-size: 0.875rem; /* Menor que o título */
+  font-weight: 400; /* Regular */
+  margin: 0;
+  line-height: 1.5;
+}

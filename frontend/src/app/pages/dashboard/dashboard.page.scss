@@ -1,0 +1,116 @@
+/* Paleta de Cores e Tema Escuro */
+$bg-main: #0a0f18;
+$bg-surface: #0f172a;
+$accent: #94a3b8;
+$header-bg: #475569;
+$header-text: #ffffff;
+$subheader-bg: #1e293b;
+$subheader-text: #94a3b8;
+$border-color: #334155;
+$text-value: #e2e8f0;
+
+:host {
+  /* Tipografia clean */
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  --ion-font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  
+  /* Fundo principal e texto padrão */
+  --ion-background-color: #{$bg-main};
+  --ion-text-color: #{$text-value};
+
+  /* Headers e Navbars */
+  ion-header {
+    ion-toolbar.main-header {
+      --background: #{$header-bg};
+      --color: #{$header-text};
+    }
+    
+    ion-toolbar.subheader {
+      --background: #{$subheader-bg};
+      --color: #{$subheader-text};
+      
+      ion-item.vehicle-selector {
+        --background: transparent;
+        --color: #{$subheader-text};
+        
+        ion-icon {
+          color: #{$accent};
+        }
+        ion-select {
+          --color: #{$text-value};
+        }
+      }
+    }
+    
+    ion-segment {
+      --background: #{$subheader-bg};
+      ion-segment-button {
+        --color: #64748b;
+        --color-checked: #{$text-value};
+        --indicator-color: #{$accent};
+        
+        &::part(indicator-background) {
+          background: #{$accent};
+        }
+      }
+    }
+  }
+
+  /* Cards e Superfícies */
+  ion-card {
+    --background: #{$bg-surface};
+    --color: #{$text-value};
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    margin: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    ion-card-header {
+      padding-bottom: 8px;
+      ion-card-title {
+        color: #{$text-value};
+        font-weight: 600;
+        font-size: 1.25rem;
+      }
+      ion-card-subtitle {
+        color: #{$accent};
+      }
+    }
+  }
+
+  /* Formulário: Labels em accent, Valores em e2e8f0, Borda Inferior em border-color */
+  form ion-item {
+    --background: transparent;
+    --border-color: #{$border-color};
+    --border-width: 0 0 1px 0;
+    --border-style: solid;
+    --highlight-color-focused: #{$accent};
+    --color: #{$text-value};
+    margin-bottom: 4px;
+
+    ion-label {
+      color: #{$accent} !important;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    ion-input, ion-select {
+      --color: #{$text-value};
+      --placeholder-color: #475569;
+      font-size: 1rem;
+    }
+  }
+
+  /* Botão Primário */
+  ion-button.primary-btn {
+    --background: #{$header-bg};
+    --color: #{$header-text};
+    --border-radius: 8px;
+    --box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-weight: 600;
+    margin-top: 24px;
+    height: 48px;
+    text-transform: none;
+    font-size: 1.05rem;
+  }
+}

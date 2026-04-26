@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <!-- Botão de Voltar para a página anterior, padrão do iOS/Android (Master-Detail) -->
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalhes da Viagem</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Spinner de Loading enquanto aguarda a API HTTP -->
+  <div *ngIf="carregando" class="ion-text-center ion-margin-top">
+    <ion-spinner></ion-spinner>
+    <p>Buscando dados...</p>
+  </div>
+
+  <!-- Cartão principal exibindo o Detalhe do Mestre -->
+  <ion-card *ngIf="!carregando && registro as reg">
+    <ion-card-header>
+      <ion-card-subtitle>{{ reg.tipo_combustivel }}</ion-card-subtitle>
+      <ion-card-title>
+        {{ reg.data_abastecimento | date:'dd/MM/yyyy' }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="full">
+        <ion-item>
+          <ion-icon name="speedometer-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Odômetro</h3>
+            <p>{{ reg.odometro }} km</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="water-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Volume Abastecido</h3>
+            <p>{{ reg.litros }} L</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Preço na Bomba</h3>
+            <p>{{ reg.preco_litro | currency:'BRL':'symbol' }} / Litro</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="cash-outline" slot="start" color="success"></ion-icon>
+          <ion-label>
+            <h2><strong>Valor Faturado</strong></h2>
+            <p>{{ reg.valor_total | currency:'BRL':'symbol' }}</p>
+          </ion-label>
+        </ion-item>
+
+        <!-- Apenas mostrar se foi fornecido nome do posto -->
+        <ion-item *ngIf="reg.posto_nome">
+          <ion-icon name="business-outline" slot="start"></ion-icon>
+          <ion-label>
+            <h3>Local</h3>
+            <p>{{ reg.posto_nome }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      
+      <div class="ion-margin-top ion-text-center">
+        <ion-button color="danger" fill="outline" expand="block" (click)="confirmarExclusao()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Excluir Registro
+        </ion-button>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+
+  <!-- Estado vazio se não encontrou o id -->
+  <ion-card *ngIf="!carregando && !registro" color="danger">
+    <ion-card-content>
+      O registro solicitado não foi encontrado no banco de dados.
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

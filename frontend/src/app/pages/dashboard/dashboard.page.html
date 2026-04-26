@@ -1,0 +1,298 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="main-header">
+    <ion-title>Gestão de Abastecimento</ion-title>
+  </ion-toolbar>
+
+  <!-- Seletor Global de Veículos -->
+  <ion-toolbar class="subheader">
+    <ion-item lines="none" class="vehicle-selector">
+      <ion-icon name="car-sport-outline" slot="start"></ion-icon>
+      <ion-label>Veículo Ativo</ion-label>
+      <ion-select [(ngModel)]="veiculoAtual" (ionChange)="trocarVeiculo()" interface="popover">
+        <ion-select-option *ngFor="let v of veiculosDisponiveis" [value]="v">{{ v }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-toolbar>
+
+  <!-- Abas usando Ion Segment -->
+  <ion-toolbar class="subheader">
+    <ion-segment [(ngModel)]="abaAtual" mode="ios">
+      <ion-segment-button value="registrar">
+        <ion-label>Registrar</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="historico">
+        <ion-label>Histórico</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="estatisticas">
+        <ion-label>Estatística</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="postos">
+        <ion-label>Postos</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- ABA 1: REGISTRAR (Mestre) -->
+  <div *ngIf="abaAtual === 'registrar'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Novo Abastecimento</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="abastecimentoForm" (ngSubmit)="registrar()">
+          
+          <ion-item>
+            <ion-label position="stacked">Data</ion-label>
+            <ion-input type="date" formControlName="data_abastecimento"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Odômetro (km)</ion-label>
+            <ion-input type="number" formControlName="odometro" placeholder="10500"></ion-input>
+          </ion-item>
+
+          <!-- Aviso automático de KM percorridos -->
+          <ion-note *ngIf="kmPercorridos !== null" style="color: #94a3b8;" class="ion-padding-start">
+            KM percorrido: <strong>{{ kmPercorridos }} km</strong> desde o último abastecimento.
+          </ion-note>
+
+          <ion-item>
+            <ion-label position="stacked">Litros</ion-label>
+            <ion-input type="number" formControlName="litros" placeholder="45.5"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Preço/Litro (R$)</ion-label>
+            <ion-input type="number" formControlName="preco_litro" placeholder="5.49"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Combustível</ion-label>
+            <ion-select formControlName="tipo_combustivel">
+              <ion-select-option value="Gasolina">Gasolina</ion-select-option>
+              <ion-select-option value="Etanol">Etanol</ion-select-option>
+              <ion-select-option value="Diesel">Diesel</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Posto (Opcional)</ion-label>
+            <ion-input type="text" formControlName="posto_nome" placeholder="Posto Ipiranga..."></ion-input>
+          </ion-item>
+
+          <!-- Exibição em Tempo Real do Valor Total -->
+          <ion-item lines="none" class="ion-margin-top" *ngIf="valorTotalEstimado > 0">
+            <ion-label style="color: #e2e8f0;">
+              <strong>Total Estimado:</strong> {{ valorTotalEstimado | currency:'BRL':'symbol' }}
+            </ion-label>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" [disabled]="abastecimentoForm.invalid" class="primary-btn">
+            Salvar Registro
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- ABA 2: HISTÓRICO -->
+  <div *ngIf="abaAtual === 'historico'">
+    
+    <!-- Filtros -->
+    <ion-row>
+      <ion-col size="6">
+        <ion-item lines="none">
+          <ion-label position="stacked">Combustível</ion-label>
+          <ion-select [(ngModel)]="filtroCombustivel">
+            <ion-select-option value="Todos">Todos</ion-select-option>
+            <ion-select-option value="Gasolina">Gasolina</ion-select-option>
+            <ion-select-option value="Etanol">Etanol</ion-select-option>
+            <ion-select-option value="Diesel">Diesel</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+      <ion-col size="6">
+        <ion-item lines="none">
+          <ion-label position="stacked">Período</ion-label>
+          <ion-select [(ngModel)]="filtroPeriodo">
+            <ion-select-option value="Tudo">Tudo</ion-select-option>
+            <ion-select-option value="Esta Semana">Semana</ion-select-option>
+            <ion-select-option value="Este Mês">Este Mês</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+
+    <!-- Lista do Histórico (Mestre) -->
+    <ion-list>
+      <!-- Item Sliding para o Swipe-to-delete -->
+      <ion-item-sliding *ngFor="let item of historicoFiltrado">
+        
+        <!-- O clique em um item abre os detalhes -->
+        <ion-item button (click)="irParaDetalhes(item.id)">
+          <ion-icon name="water-outline" slot="start" color="secondary"></ion-icon>
+          <ion-label>
+            <h3>{{ item.data_abastecimento | date:'dd/MM/yyyy' }}</h3>
+            <p>{{ item.tipo_combustivel }} &bull; {{ item.litros }}L</p>
+          </ion-label>
+          <ion-note slot="end" color="success">
+            {{ item.valor_total | currency:'BRL':'symbol' }}
+          </ion-note>
+        </ion-item>
+
+        <!-- Opção oculta (deslizar para a esquerda) -->
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deletarRegistro(item.id)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+        
+      </ion-item-sliding>
+      
+      <ion-item *ngIf="historicoFiltrado.length === 0">
+        <ion-label class="ion-text-center">Nenhum registro encontrado para os filtros.</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+
+  <!-- ABA 3: ESTATÍSTICAS -->
+  <div *ngIf="abaAtual === 'estatisticas'">
+    
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>Média Histórica</ion-card-subtitle>
+        <ion-card-title style="color: #ffffff;">
+          {{ mediaConsumoGeral | number:'1.1-2' }} km/L
+        </ion-card-title>
+      </ion-card-header>
+    </ion-card>
+
+    <ion-row>
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>Gasto Mês Atual</ion-card-subtitle>
+            <ion-card-title style="color: #ffffff;">
+              {{ gastoMesAtual | currency:'BRL':'symbol' }}
+            </ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-subtitle>Preço Médio</ion-card-subtitle>
+            <ion-card-title style="color: #ffffff;">
+              {{ precoMedioMes | currency:'BRL':'symbol' }}
+            </ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- Previsão de Próximo Abastecimento -->
+    <ion-card *ngIf="previsaoDias !== null">
+      <ion-card-header>
+        <ion-card-subtitle>Inteligência</ion-card-subtitle>
+        <ion-card-title style="color: #ffffff;">
+          <ion-icon name="calendar-outline"></ion-icon> Previsão
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: #ffffff;">
+        Próximo abastecimento previsto em: <strong>{{ previsaoDias }} dias</strong> ({{ previsaoData }}).
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Gráficos -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Evolução do Preço</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="height: 250px;">
+        <canvas baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'">
+        </canvas>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Gasto Mensal</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="height: 250px;">
+        <canvas baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Metas Mensais -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>Planejamento</ion-card-subtitle>
+        <ion-card-title>Meta Mensal de Gasto</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="floating">Definir Meta (R$)</ion-label>
+          <ion-input type="number" [(ngModel)]="metaMensal" (ionChange)="calcularEstatisticas()"></ion-input>
+        </ion-item>
+        
+        <div class="ion-margin-top" *ngIf="metaMensal > 0">
+          <p>
+            Gasto: {{ gastoMesAtual | currency:'BRL':'symbol' }} de {{ metaMensal | currency:'BRL':'symbol' }} 
+            ({{ (progressoMeta * 100) | number:'1.0-0' }}%)
+          </p>
+          <ion-progress-bar 
+            [value]="progressoMeta" 
+            [color]="progressoMeta >= 0.8 ? 'danger' : 'success'">
+          </ion-progress-bar>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="block" color="danger" class="ion-margin" (click)="gerarPDF()">
+      <ion-icon name="document-text-outline" slot="start"></ion-icon>
+      Exportar Relatório PDF
+    </ion-button>
+
+  </div>
+
+  <!-- ABA 4: RANKING DE POSTOS -->
+  <div *ngIf="abaAtual === 'postos'">
+    
+    <ion-card color="primary">
+      <ion-card-header>
+        <ion-card-title>Ranking da Garagem</ion-card-title>
+        <ion-card-subtitle>Os postos com menor preço e melhor combustível</ion-card-subtitle>
+      </ion-card-header>
+    </ion-card>
+
+    <ion-list>
+      <ion-item *ngFor="let posto of rankingPostos; let i = index">
+        <ion-badge slot="start" [color]="i === 0 ? 'warning' : (i === 1 ? 'medium' : 'light')">#{{ i + 1 }}</ion-badge>
+        <ion-label>
+          <h2><strong>{{ posto.nome }}</strong></h2>
+          <p>Preço Médio: {{ posto.precoMedio | currency:'BRL':'symbol' }}</p>
+        </ion-label>
+        <ion-note slot="end" color="success">
+          {{ posto.melhorRendimento | number:'1.1-1' }} km/L
+        </ion-note>
+      </ion-item>
+      
+      <ion-item *ngIf="rankingPostos.length === 0">
+        <ion-label class="ion-text-center">Ainda não há postos registrados no seu histórico.</ion-label>
+      </ion-item>
+    </ion-list>
+
+  </div>
+
+</ion-content>

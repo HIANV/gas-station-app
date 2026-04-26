@@ -1,0 +1,31 @@
+# Ambientes Virtuais e Pacotes
+venv/
+node_modules/
+__pycache__/
+.env
+
+# Arquivos de Banco de Dados Local
+*.db
+*.sqlite
+*.sqlite3
+gas_station.db
+
+# Pastas de Backup / Testes Antigos do Usuário (Para manter o repositório limpo)
+app_temp/
+frontend_old/
+frontend_arquivos/
+
+# Builds e Cache do Frontend
+frontend/www/
+frontend/.angular/
+frontend/dist/
+
+# Ferramentas / IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
