@@ -7,8 +7,8 @@ import { Abastecimento } from '../models/abastecimento.model';
   providedIn: 'root'
 })
 export class AbastecimentoService {
-  // Configurado para rodar no celular na mesma rede WiFi (IP da máquina)
-  private apiUrl = 'http://10.0.0.187:8000/abastecimentos';
+  // Conectado com o Backend oficial na Nuvem (Render)
+  private apiUrl = 'https://gas-station-app-j9w8.onrender.com/abastecimentos';
 
   constructor(private http: HttpClient) {}
 
